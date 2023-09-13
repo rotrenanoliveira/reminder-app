@@ -1,80 +1,10 @@
-import { FormEvent, useMemo, useState } from 'react'
-import { differenceInSeconds } from './util/calc-date/difference-in-seconds'
+import { FormEvent, useContext } from 'react'
 import { Countdown } from './components/Countdown'
-import { haskey } from './util/has-key'
+import { ReminderContext } from './contexts/reminder'
 import './App.css'
 
 export function App() {
-  const [reminders, setReminders] = useState<Reminder[]>(() => {
-    const stringifiedReminders = localStorage.getItem('@reminder-me:countdown')
-
-    if (stringifiedReminders === null) {
-      return []
-    }
-
-    const parsedReminders: unknown[] = JSON.parse(stringifiedReminders)
-
-    const reminders: Reminder[] = parsedReminders.map((reminder) => {
-      if (!(reminder && typeof reminder === 'object')) {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      if (
-        !haskey('at', reminder) ||
-        !haskey('of', reminder) ||
-        !haskey('status', reminder) ||
-        !haskey('visibility', reminder) ||
-        !haskey('created_at', reminder)
-      ) {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      if (
-        !(typeof reminder.at === 'string') ||
-        !(typeof reminder.of === 'string') ||
-        !(typeof reminder.created_at === 'string')
-      ) {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      if (reminder.status !== 'completed' && reminder.status !== 'in-progress') {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      if (reminder.visibility !== 'hidden' && reminder.visibility !== 'visible') {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      return {
-        of: reminder.of,
-        at: new Date(reminder.at),
-        created_at: new Date(reminder.created_at),
-        visibility: reminder.visibility,
-        status: reminder.status,
-      }
-    })
-
-    return reminders
-  })
-
-  const remindersInProgress = reminders.filter((reminder) => reminder.status === 'in-progress')
-
-  const currentReminder = useMemo(() => {
-    return remindersInProgress.sort((a, b) => {
-      const aSecondsDiff = differenceInSeconds(a.at, new Date())
-      const bSecondsDiff = differenceInSeconds(b.at, new Date())
-
-      if (aSecondsDiff < bSecondsDiff) {
-        return -1
-      }
-
-      if (aSecondsDiff > bSecondsDiff) {
-        return 1
-      }
-
-      return 0
-    })[0]
-  }, [remindersInProgress])
+  const { reminders, currentReminder, createNewReminder, completeReminder } = useContext(ReminderContext)
 
   function handleCreateReminder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -84,58 +14,26 @@ export function App() {
     const reminderOf = formData.get('reminder-of')
     const reminderAt = formData.get('reminder-at')
 
-    if (reminderOf === null || reminderAt === null) {
-      throw new Error('Reminder me of or at could no be null.')
+    if (reminderOf === null && reminderAt === null) {
+      throw new Error('Fields reminder-of and reminder-at is required.')
     }
 
-    const reminder: Reminder = {
-      created_at: new Date(),
-      of: String(reminderOf),
-      at: new Date(String(reminderAt)),
-      visibility: 'visible',
-      status: 'in-progress',
+    if (typeof reminderOf !== 'string') {
+      throw new TypeError('Remind of should be a string')
     }
 
-    setReminders((state) => {
-      const reminders = [reminder, ...state]
-      localStorage.setItem('@reminder-me:countdown', JSON.stringify(reminders))
+    if (typeof reminderAt !== 'string') {
+      throw new TypeError('Remind at should be a string')
+    }
 
-      return reminders
+    createNewReminder({
+      reminderOf: reminderOf,
+      reminderAt: new Date(reminderAt),
     })
-
-    event.currentTarget.reset()
   }
 
   function handleCompleteReminder(createdAt: Date) {
-    const reminder = reminders.find((reminder) => reminder.created_at.getTime() === createdAt.getTime())
-
-    if (!reminder) {
-      // throw new Error('Remind not found')
-      console.warn('Remind not found')
-
-      return
-    }
-
-    setReminders((state) => {
-      const reminders = state.map((reminder) => {
-        if (reminder.created_at.getTime() !== createdAt.getTime()) {
-          return reminder
-        }
-
-        reminder.status = 'completed'
-        reminder.visibility = 'hidden'
-
-        return {
-          ...reminder,
-        }
-      })
-
-      localStorage.setItem('@reminder-me:countdown', JSON.stringify(reminders))
-
-      return reminders
-    })
-
-    console.log(reminders)
+    completeReminder(createdAt)
   }
 
   return (

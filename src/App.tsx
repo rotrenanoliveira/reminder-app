@@ -30,10 +30,12 @@ export function App() {
       reminderOf: reminderOf,
       reminderAt: new Date(reminderAt),
     })
+
+    event.currentTarget.reset()
   }
 
-  function handleCompleteReminder(createdAt: Date) {
-    completeReminder(createdAt)
+  function handleCompleteReminder(reminderId: string) {
+    completeReminder(reminderId)
   }
 
   return (
@@ -59,7 +61,7 @@ export function App() {
       <div className="countdown-list">
         {reminders.map((reminder) => {
           return (
-            <p key={reminder.created_at.getTime()}>
+            <p key={reminder.id}>
               {reminder.of} - {reminder.at.toLocaleString('pt-BR')}
             </p>
           )

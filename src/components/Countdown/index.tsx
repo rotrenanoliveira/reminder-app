@@ -4,7 +4,7 @@ import { calcDateTime } from '../../util/calc-datetime'
 
 interface CountdownProps {
   reminder: Reminder
-  completeReminder: (createdAt: Date) => void
+  completeReminder: (reminderId: string) => void
 }
 
 export function Countdown({ reminder, completeReminder }: CountdownProps) {
@@ -25,11 +25,15 @@ export function Countdown({ reminder, completeReminder }: CountdownProps) {
     const interval = setInterval(() => {
       const secondsDiff = differenceInSeconds(reminder.at, new Date())
 
+      if (secondsDiff > remainingSeconds) {
+        setRemainingSeconds(secondsDiff)
+      }
+
       if (secondsDiff !== 0) {
         setRemainingSeconds((seconds) => seconds - 1)
         setEventDate(calcDateTime(remainingSeconds))
       } else {
-        completeReminder(reminder.created_at)
+        completeReminder(reminder.id)
         clearInterval(interval)
       }
     }, 1000)

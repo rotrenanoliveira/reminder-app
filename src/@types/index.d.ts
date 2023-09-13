@@ -4,9 +4,10 @@ declare type ReminderCreateInput = {
 }
 
 declare interface Reminder {
+  id: string
   of: string
   at: Date
-  created_at: Date
+  createdAt: Date
   visibility: 'hidden' | 'visible'
   status: 'completed' | 'in-progress'
 }

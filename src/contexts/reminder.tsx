@@ -1,13 +1,23 @@
 import React, { createContext, useMemo, useState } from 'react'
 import { differenceInSeconds } from '../util/calc-date/difference-in-seconds'
-import { haskey } from '../util/has-key'
+import { v4 as uuid } from 'uuid'
+import { z } from 'zod'
 
 interface ReminderContextType {
   reminders: Reminder[]
   currentReminder: Reminder
   createNewReminder: ({ reminderOf, reminderAt }: ReminderCreateInput) => void
-  completeReminder: (createdAt: Date) => void
+  completeReminder: (reminderId: string) => void
 }
+
+const reminderSchema = z.object({
+  id: z.string().uuid(),
+  of: z.string(),
+  at: z.coerce.date(),
+  status: z.enum(['completed', 'in-progress']),
+  visibility: z.enum(['hidden', 'visible']),
+  createdAt: z.coerce.date(),
+})
 
 export const ReminderContext = createContext({} as ReminderContextType)
 
@@ -17,53 +27,22 @@ interface ReminderContextProviderProps {
 
 export function ReminderContextProvider({ children }: ReminderContextProviderProps) {
   const [reminders, setReminders] = useState<Reminder[]>(() => {
-    const stringifiedReminders = localStorage.getItem('@reminder-me:countdown')
+    const stringifiedData = localStorage.getItem('@reminder-me:countdown')
 
-    if (stringifiedReminders === null) {
+    if (stringifiedData === null) {
       return []
     }
 
-    const parsedReminders: unknown[] = JSON.parse(stringifiedReminders)
+    const parsedData: Reminder[] = JSON.parse(stringifiedData)
 
-    const reminders: Reminder[] = parsedReminders.map((reminder) => {
-      if (!(reminder && typeof reminder === 'object')) {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      if (
-        !haskey('at', reminder) ||
-        !haskey('of', reminder) ||
-        !haskey('status', reminder) ||
-        !haskey('visibility', reminder) ||
-        !haskey('created_at', reminder)
-      ) {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      if (
-        !(typeof reminder.at === 'string') ||
-        !(typeof reminder.of === 'string') ||
-        !(typeof reminder.created_at === 'string')
-      ) {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      if (reminder.status !== 'completed' && reminder.status !== 'in-progress') {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      if (reminder.visibility !== 'hidden' && reminder.visibility !== 'visible') {
-        throw new TypeError('reminder is not assigned correctly')
-      }
-
-      return {
-        of: reminder.of,
-        at: new Date(reminder.at),
-        created_at: new Date(reminder.created_at),
-        visibility: reminder.visibility,
-        status: reminder.status,
-      }
-    })
+    const reminders = parsedData
+      .map((data) => {
+        const parsedReminder = reminderSchema.safeParse(data)
+        if (parsedReminder.success === true) {
+          return parsedReminder.data
+        }
+      })
+      .filter((data): data is Reminder => data !== undefined)
 
     return reminders
   })
@@ -89,9 +68,10 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
 
   function createNewReminder({ reminderOf, reminderAt }: ReminderCreateInput) {
     const reminder: Reminder = {
-      created_at: new Date(),
+      id: uuid(),
       of: String(reminderOf),
       at: new Date(String(reminderAt)),
+      createdAt: new Date(),
       visibility: 'visible',
       status: 'in-progress',
     }
@@ -104,8 +84,8 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
     })
   }
 
-  function completeReminder(createdAt: Date) {
-    const reminder = reminders.find((reminder) => reminder.created_at.getTime() === createdAt.getTime())
+  function completeReminder(reminderId: string) {
+    const reminder = reminders.find((reminder) => reminder.id === reminderId)
 
     if (!reminder) {
       throw new Error('Remind not found')
@@ -113,7 +93,7 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
 
     setReminders((state) => {
       const reminders = state.map((reminder) => {
-        if (reminder.created_at.getTime() !== createdAt.getTime()) {
+        if (reminder.id !== reminderId) {
           return reminder
         }
 

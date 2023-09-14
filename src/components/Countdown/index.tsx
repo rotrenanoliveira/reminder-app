@@ -1,47 +1,42 @@
-import { useState, useEffect } from 'react'
-import { differenceInSeconds } from '../../util/calc-date/difference-in-seconds'
+import { useState, useEffect, useContext } from 'react'
+import { ReminderContext } from '../../contexts/reminder'
 import { calcDateTime } from '../../util/calc-datetime'
+import { differenceInSeconds } from '../../util/calc-date/difference-in-seconds'
 
-interface CountdownProps {
-  reminder: Reminder
-  completeReminder: (reminderId: string) => void
-}
-
-export function Countdown({ reminder, completeReminder }: CountdownProps) {
-  // console.log(reminder)
-
-  const [remainingSeconds, setRemainingSeconds] = useState(differenceInSeconds(reminder.at, new Date()))
-
-  useEffect(() => {
-    setRemainingSeconds(differenceInSeconds(reminder.at, new Date()))
-  }, [reminder])
+export function Countdown() {
+  const { currentReminder, remainingSeconds, setSecondsRemaining, completeReminder } = useContext(ReminderContext)
 
   const [eventDate, setEventDate] = useState({ days: '00h', hours: '00h', minutes: '00m', seconds: '00s' })
   const { days, hours, minutes, seconds } = eventDate
 
   useEffect(() => {
-    // console.log(reminder)
+    let interval: number
 
-    const interval = setInterval(() => {
-      const secondsDiff = differenceInSeconds(reminder.at, new Date())
+    if (currentReminder) {
+      setEventDate(calcDateTime(remainingSeconds))
 
-      if (secondsDiff > remainingSeconds) {
-        setRemainingSeconds(secondsDiff)
-      }
+      interval = setInterval(() => {
+        const secondsDiff = differenceInSeconds(currentReminder.at, new Date())
 
-      if (secondsDiff !== 0) {
-        setRemainingSeconds((seconds) => seconds - 1)
-        setEventDate(calcDateTime(remainingSeconds))
-      } else {
-        completeReminder(reminder.id)
-        clearInterval(interval)
-      }
-    }, 1000)
+        if (secondsDiff <= remainingSeconds && secondsDiff !== 0) {
+          setSecondsRemaining(secondsDiff)
+        } else {
+          setSecondsRemaining(secondsDiff)
+
+          completeReminder(currentReminder.id)
+          clearInterval(interval)
+        }
+      }, 1000)
+    }
 
     return () => {
       clearInterval(interval)
     }
-  }, [remainingSeconds, reminder, completeReminder])
+  }, [currentReminder, remainingSeconds, completeReminder, setSecondsRemaining])
+
+  if (!currentReminder) {
+    return <></>
+  }
 
   return (
     <div className="countdown-card">
@@ -52,7 +47,7 @@ export function Countdown({ reminder, completeReminder }: CountdownProps) {
         <span>{seconds}</span>
       </div>
 
-      <span>{reminder.of}</span>
+      <span>{currentReminder.of}</span>
     </div>
   )
 }

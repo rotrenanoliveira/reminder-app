@@ -4,7 +4,7 @@ import { ReminderContext } from './contexts/reminder'
 import './App.css'
 
 export function App() {
-  const { reminders, currentReminder, createNewReminder, completeReminder } = useContext(ReminderContext)
+  const { reminders, currentReminder, createNewReminder } = useContext(ReminderContext)
 
   function handleCreateReminder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -34,10 +34,6 @@ export function App() {
     event.currentTarget.reset()
   }
 
-  function handleCompleteReminder(reminderId: string) {
-    completeReminder(reminderId)
-  }
-
   return (
     <main>
       <h1>Countdown - Reminder me</h1>
@@ -56,7 +52,7 @@ export function App() {
         <button>Reminder me</button>
       </form>
 
-      {currentReminder && <Countdown reminder={currentReminder} completeReminder={handleCompleteReminder} />}
+      {currentReminder && <Countdown />}
 
       <div className="countdown-list">
         {reminders.map((reminder) => {

@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useMemo, useReducer } from 'react'
+import React, { createContext, useEffect, useMemo, useReducer, useState } from 'react'
 import { completeReminderAction, createReminder } from '../reducers/reminders/actions'
 import { differenceInSeconds } from '../util/calc-date/difference-in-seconds'
 import { reminderReducer } from '../reducers/reminders/reducer'
@@ -7,8 +7,10 @@ import { v4 as uuid } from 'uuid'
 interface ReminderContextType {
   reminders: Reminder[]
   currentReminder: Reminder | null
+  remainingSeconds: number
   createNewReminder: ({ reminderOf, reminderAt }: ReminderCreateInput) => void
   completeReminder: (reminderId: string) => void
+  setSecondsRemaining: (seconds: number) => void
 }
 
 // Create Reminder Context
@@ -38,36 +40,10 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
     },
   )
 
-  function createNewReminder(data: ReminderCreateInput) {
-    const createdAt = new Date()
-    const secondsDiff = differenceInSeconds(data.reminderAt, createdAt)
-
-    const status = secondsDiff > 0 ? 'in-progress' : 'completed'
-    const visibility = status === 'completed' ? 'hidden' : 'visible'
-
-    dispatch(
-      createReminder({
-        id: uuid(),
-        of: data.reminderOf,
-        at: data.reminderAt,
-        createdAt,
-        visibility,
-        status,
-      }),
-    )
-  }
-
-  function completeReminder(reminderId: string) {
-    dispatch(completeReminderAction(reminderId))
-  }
-
-  useEffect(() => {
-    const stateJSON = JSON.stringify(remindersState)
-    localStorage.setItem('@reminder-me:countdown', stateJSON)
-  }, [remindersState])
-
+  // GET reminders from reminders state
   const reminders = remindersState.reminders
 
+  // GET the current reminder by default is the closest
   const currentReminder = useMemo(() => {
     const remindersInProgress = reminders.filter((reminder) => reminder.status === 'in-progress')
 
@@ -100,8 +76,61 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
     } as Reminder
   }, [reminders])
 
+  // Seconds left until reminder
+  const [remainingSeconds, setRemainingSeconds] = useState(() => {
+    if (currentReminder) {
+      return differenceInSeconds(currentReminder.at, new Date())
+    }
+
+    return 0
+  })
+
+  function setSecondsRemaining(seconds: number) {
+    setRemainingSeconds(seconds)
+  }
+
+  function createNewReminder(data: ReminderCreateInput) {
+    const createdAt = new Date()
+    const secondsDiff = differenceInSeconds(data.reminderAt, createdAt)
+
+    const status = secondsDiff > 0 ? 'in-progress' : 'completed'
+    const visibility = status === 'completed' ? 'hidden' : 'visible'
+
+    dispatch(
+      createReminder({
+        id: uuid(),
+        of: data.reminderOf,
+        at: data.reminderAt,
+        createdAt,
+        visibility,
+        status,
+      }),
+    )
+  }
+
+  function completeReminder(reminderId: string) {
+    dispatch(completeReminderAction(reminderId))
+  }
+
+  useEffect(() => {
+    const stateJSON = JSON.stringify(remindersState)
+    localStorage.setItem('@reminder-me:countdown', stateJSON)
+  }, [remindersState])
+
+  useEffect(() => {
+    setRemainingSeconds(() => {
+      if (currentReminder) {
+        return differenceInSeconds(currentReminder.at, new Date())
+      }
+
+      return 0
+    })
+  }, [currentReminder])
+
   return (
-    <ReminderContext.Provider value={{ reminders, currentReminder, createNewReminder, completeReminder }}>
+    <ReminderContext.Provider
+      value={{ reminders, currentReminder, remainingSeconds, createNewReminder, completeReminder, setSecondsRemaining }}
+    >
       {children}
     </ReminderContext.Provider>
   )

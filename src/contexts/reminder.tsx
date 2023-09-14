@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid'
 
 interface ReminderContextType {
   reminders: Reminder[]
-  currentReminder: Reminder
+  currentReminder: Reminder | null
   createNewReminder: ({ reminderOf, reminderAt }: ReminderCreateInput) => void
   completeReminder: (reminderId: string) => void
 }
@@ -31,34 +31,12 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
       if (storedState) {
         return JSON.parse(storedState)
       }
+
+      return {
+        reminders: [],
+      }
     },
   )
-
-  const remindersInProgress = remindersState.reminders.filter((reminder) => reminder.status === 'in-progress')
-
-  const currentReminder = useMemo(() => {
-    const nearestReminder = remindersInProgress.sort((a, b) => {
-      const aSecondsDiff = differenceInSeconds(new Date(a.at), new Date())
-      const bSecondsDiff = differenceInSeconds(new Date(b.at), new Date())
-
-      if (aSecondsDiff < bSecondsDiff) {
-        return -1
-      }
-
-      if (aSecondsDiff > bSecondsDiff) {
-        return 1
-      }
-
-      return 0
-    })[0]
-
-    // When data is parsed from localStorage the dates fields are assigned type "string" and need to be converted to "Date" or "number"
-    return {
-      ...nearestReminder,
-      at: new Date(nearestReminder.at),
-      createdAt: new Date(nearestReminder.createdAt),
-    }
-  }, [remindersInProgress])
 
   function createNewReminder(data: ReminderCreateInput) {
     dispatch(
@@ -82,10 +60,41 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
     localStorage.setItem('@reminder-me:countdown', stateJSON)
   }, [remindersState])
 
+  const reminders = remindersState.reminders
+  const remindersInProgress = reminders.filter((reminder) => reminder.status === 'in-progress')
+
+  const currentReminder = useMemo(() => {
+    const sortedReminders: Reminder[] = remindersInProgress.sort((a, b) => {
+      const aSecondsDiff = differenceInSeconds(new Date(a.at), new Date())
+      const bSecondsDiff = differenceInSeconds(new Date(b.at), new Date())
+
+      if (aSecondsDiff < bSecondsDiff) {
+        return -1
+      }
+
+      if (aSecondsDiff > bSecondsDiff) {
+        return 1
+      }
+
+      return 0
+    })
+
+    const nearestReminder = sortedReminders.length > 0 ? sortedReminders[0] : undefined
+
+    if (nearestReminder === undefined) {
+      return null
+    }
+
+    // When data is parsed from localStorage the dates fields are assigned type "string" and need to be converted
+    return {
+      ...nearestReminder,
+      at: new Date(nearestReminder.at),
+      createdAt: new Date(nearestReminder.createdAt),
+    } as Reminder
+  }, [remindersInProgress])
+
   return (
-    <ReminderContext.Provider
-      value={{ reminders: remindersState.reminders, currentReminder, createNewReminder, completeReminder }}
-    >
+    <ReminderContext.Provider value={{ reminders, currentReminder, createNewReminder, completeReminder }}>
       {children}
     </ReminderContext.Provider>
   )

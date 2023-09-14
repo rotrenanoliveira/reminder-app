@@ -39,14 +39,20 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
   )
 
   function createNewReminder(data: ReminderCreateInput) {
+    const createdAt = new Date()
+    const secondsDiff = differenceInSeconds(data.reminderAt, createdAt)
+
+    const status = secondsDiff > 0 ? 'in-progress' : 'completed'
+    const visibility = status === 'completed' ? 'hidden' : 'visible'
+
     dispatch(
       createReminder({
         id: uuid(),
         of: data.reminderOf,
         at: data.reminderAt,
-        createdAt: new Date(),
-        visibility: 'visible',
-        status: 'in-progress',
+        createdAt,
+        visibility,
+        status,
       }),
     )
   }
@@ -61,9 +67,10 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
   }, [remindersState])
 
   const reminders = remindersState.reminders
-  const remindersInProgress = reminders.filter((reminder) => reminder.status === 'in-progress')
 
   const currentReminder = useMemo(() => {
+    const remindersInProgress = reminders.filter((reminder) => reminder.status === 'in-progress')
+
     const sortedReminders: Reminder[] = remindersInProgress.sort((a, b) => {
       const aSecondsDiff = differenceInSeconds(new Date(a.at), new Date())
       const bSecondsDiff = differenceInSeconds(new Date(b.at), new Date())
@@ -91,7 +98,7 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
       at: new Date(nearestReminder.at),
       createdAt: new Date(nearestReminder.createdAt),
     } as Reminder
-  }, [remindersInProgress])
+  }, [reminders])
 
   return (
     <ReminderContext.Provider value={{ reminders, currentReminder, createNewReminder, completeReminder }}>

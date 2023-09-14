@@ -62,7 +62,7 @@ export function App() {
         {reminders.map((reminder) => {
           return (
             <p key={reminder.id}>
-              {reminder.of} - {reminder.at.toLocaleString('pt-BR')}
+              {reminder.of} - {new Date(reminder.at).toLocaleString('pt-BR')}
             </p>
           )
         })}

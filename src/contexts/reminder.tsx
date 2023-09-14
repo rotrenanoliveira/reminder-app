@@ -1,7 +1,8 @@
-import React, { createContext, useMemo, useState } from 'react'
+import React, { createContext, useEffect, useMemo, useReducer } from 'react'
+import { completeReminderAction, createReminder } from '../reducers/reminders/actions'
 import { differenceInSeconds } from '../util/calc-date/difference-in-seconds'
+import { reminderReducer } from '../reducers/reminders/reducer'
 import { v4 as uuid } from 'uuid'
-import { z } from 'zod'
 
 interface ReminderContextType {
   reminders: Reminder[]
@@ -10,49 +11,35 @@ interface ReminderContextType {
   completeReminder: (reminderId: string) => void
 }
 
-const reminderSchema = z.object({
-  id: z.string().uuid(),
-  of: z.string(),
-  at: z.coerce.date(),
-  status: z.enum(['completed', 'in-progress']),
-  visibility: z.enum(['hidden', 'visible']),
-  createdAt: z.coerce.date(),
-})
-
+// Create Reminder Context
 export const ReminderContext = createContext({} as ReminderContextType)
 
 interface ReminderContextProviderProps {
   children: React.ReactNode
 }
 
+// Reminder Context Provider
 export function ReminderContextProvider({ children }: ReminderContextProviderProps) {
-  const [reminders, setReminders] = useState<Reminder[]>(() => {
-    const stringifiedData = localStorage.getItem('@reminder-me:countdown')
+  const [remindersState, dispatch] = useReducer(
+    reminderReducer,
+    {
+      reminders: [],
+    },
+    () => {
+      const storedState = localStorage.getItem('@reminder-me:countdown')
 
-    if (stringifiedData === null) {
-      return []
-    }
+      if (storedState) {
+        return JSON.parse(storedState)
+      }
+    },
+  )
 
-    const parsedData: Reminder[] = JSON.parse(stringifiedData)
-
-    const reminders = parsedData
-      .map((data) => {
-        const parsedReminder = reminderSchema.safeParse(data)
-        if (parsedReminder.success === true) {
-          return parsedReminder.data
-        }
-      })
-      .filter((data): data is Reminder => data !== undefined)
-
-    return reminders
-  })
-
-  const remindersInProgress = reminders.filter((reminder) => reminder.status === 'in-progress')
+  const remindersInProgress = remindersState.reminders.filter((reminder) => reminder.status === 'in-progress')
 
   const currentReminder = useMemo(() => {
-    return remindersInProgress.sort((a, b) => {
-      const aSecondsDiff = differenceInSeconds(a.at, new Date())
-      const bSecondsDiff = differenceInSeconds(b.at, new Date())
+    const nearestReminder = remindersInProgress.sort((a, b) => {
+      const aSecondsDiff = differenceInSeconds(new Date(a.at), new Date())
+      const bSecondsDiff = differenceInSeconds(new Date(b.at), new Date())
 
       if (aSecondsDiff < bSecondsDiff) {
         return -1
@@ -64,55 +51,41 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
 
       return 0
     })[0]
+
+    // When data is parsed from localStorage the dates fields are assigned type "string" and need to be converted to "Date" or "number"
+    return {
+      ...nearestReminder,
+      at: new Date(nearestReminder.at),
+      createdAt: new Date(nearestReminder.createdAt),
+    }
   }, [remindersInProgress])
 
-  function createNewReminder({ reminderOf, reminderAt }: ReminderCreateInput) {
-    const reminder: Reminder = {
-      id: uuid(),
-      of: String(reminderOf),
-      at: new Date(String(reminderAt)),
-      createdAt: new Date(),
-      visibility: 'visible',
-      status: 'in-progress',
-    }
-
-    setReminders((state) => {
-      const reminders = [reminder, ...state]
-      localStorage.setItem('@reminder-me:countdown', JSON.stringify(reminders))
-
-      return reminders
-    })
+  function createNewReminder(data: ReminderCreateInput) {
+    dispatch(
+      createReminder({
+        id: uuid(),
+        of: data.reminderOf,
+        at: data.reminderAt,
+        createdAt: new Date(),
+        visibility: 'visible',
+        status: 'in-progress',
+      }),
+    )
   }
 
   function completeReminder(reminderId: string) {
-    const reminder = reminders.find((reminder) => reminder.id === reminderId)
-
-    if (!reminder) {
-      throw new Error('Remind not found')
-    }
-
-    setReminders((state) => {
-      const reminders = state.map((reminder) => {
-        if (reminder.id !== reminderId) {
-          return reminder
-        }
-
-        reminder.status = 'completed'
-        reminder.visibility = 'hidden'
-
-        return {
-          ...reminder,
-        }
-      })
-
-      localStorage.setItem('@reminder-me:countdown', JSON.stringify(reminders))
-
-      return reminders
-    })
+    dispatch(completeReminderAction(reminderId))
   }
 
+  useEffect(() => {
+    const stateJSON = JSON.stringify(remindersState)
+    localStorage.setItem('@reminder-me:countdown', stateJSON)
+  }, [remindersState])
+
   return (
-    <ReminderContext.Provider value={{ reminders, currentReminder, createNewReminder, completeReminder }}>
+    <ReminderContext.Provider
+      value={{ reminders: remindersState.reminders, currentReminder, createNewReminder, completeReminder }}
+    >
       {children}
     </ReminderContext.Provider>
   )

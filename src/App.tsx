@@ -12,9 +12,9 @@ export function App() {
     <main>
       <Header />
 
-      <RegisterReminderForm />
-
       {currentReminder && <Countdown />}
+
+      <RegisterReminderForm />
 
       <div className="countdown-list">
         {reminders.map((reminder) => {

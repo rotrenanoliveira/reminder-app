@@ -5,6 +5,15 @@
   text-align: center;
 }
 
+main {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 90%;
+  max-width: 1024px;
+  transform: translateX(-50%);
+}
+
 .countdown {
   display: flex;
   flex-direction: column;
@@ -12,9 +21,23 @@
   justify-content: space-between;
 }
 
+.countdown-list {
+  margin-bottom: 0.5rem;
+}
+
+.countdown-item {
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.countdown-item:hover {
+  background-color: #F9F9F9;
+}
+
 .countdown-timers span {
   display: block;
   font-size: 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .countdown-timers {
@@ -22,4 +45,10 @@
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
+}
+
+@media (min-width: 768px)  {
+  main {
+    width: 75%;
+  }
 }

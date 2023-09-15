@@ -3,13 +3,14 @@ import { Countdown } from './components/Countdown'
 import { ReminderContext } from './contexts/reminder'
 import { RegisterReminderForm } from './components/Form/RegisterReminder'
 import './App.css'
+import { Header } from './components/Header'
 
 export function App() {
   const { reminders, currentReminder } = useContext(ReminderContext)
 
   return (
     <main>
-      <h1>Countdown - Reminder me</h1>
+      <Header />
 
       <RegisterReminderForm />
 
@@ -18,7 +19,7 @@ export function App() {
       <div className="countdown-list">
         {reminders.map((reminder) => {
           return (
-            <p key={reminder.id}>
+            <p className="countdown-item" key={reminder.id}>
               {reminder.of} - {new Date(reminder.at).toLocaleString('pt-BR')}
             </p>
           )

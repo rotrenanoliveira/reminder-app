@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
-import { ReminderContext } from '../../contexts/reminder'
-import { calcDateTime } from '../../util/calc-datetime'
-import { differenceInSeconds } from '../../util/calc-date/difference-in-seconds'
+import { ReminderContext } from '../contexts/reminder'
+import { calcDateTime } from '../util/calc-datetime'
+import { differenceInSeconds } from '../util/calc-date/difference-in-seconds'
 
 export function Countdown() {
   const { currentReminder, remainingSeconds, setSecondsRemaining, completeReminder } = useContext(ReminderContext)
@@ -39,7 +39,7 @@ export function Countdown() {
   }
 
   return (
-    <div className="countdown-card">
+    <div className="countdown">
       <div className="countdown-timers">
         <span>{days}</span>
         <span>{hours}</span>
@@ -47,7 +47,7 @@ export function Countdown() {
         <span>{seconds}</span>
       </div>
 
-      <span>{currentReminder.of}</span>
+      <span className="description">{currentReminder.of}</span>
     </div>
   )
 }

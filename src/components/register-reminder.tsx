@@ -1,7 +1,5 @@
 import { FormEvent, useContext } from 'react'
-import { ReminderContext } from '../../../contexts/reminder'
-import { InputGroup } from '../../ui/InputGroup'
-import './form.css'
+import { ReminderContext } from '../contexts/reminder'
 
 export function RegisterReminderForm() {
   const { createNewReminder } = useContext(ReminderContext)
@@ -38,15 +36,15 @@ export function RegisterReminderForm() {
     <form onSubmit={handleCreateReminder}>
       <div className="inputs-form">
         <span>Remind me</span>
-        <InputGroup>
+        <div>
           <label htmlFor="reminder-of">of:</label>
           <input type="text" name="reminder-of" required />
-        </InputGroup>
+        </div>
 
-        <InputGroup>
+        <div>
           <label htmlFor="reminder-at">at:</label>
           <input type="datetime-local" name="reminder-at" placeholder="" required />
-        </InputGroup>
+        </div>
       </div>
 
       <button>Remind me</button>

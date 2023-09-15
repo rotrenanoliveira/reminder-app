@@ -1,9 +1,10 @@
 import { useContext } from 'react'
-import { Countdown } from './components/Countdown'
 import { ReminderContext } from './contexts/reminder'
-import { RegisterReminderForm } from './components/Form/RegisterReminder'
-import './App.css'
-import { Header } from './components/Header'
+import { Header } from './components/header'
+import { Countdown } from './components/countdown'
+import { RegisterReminderForm } from './components/register-reminder'
+
+import './styles/home.css'
 
 export function App() {
   const { reminders, currentReminder } = useContext(ReminderContext)

@@ -1,14 +1,3 @@
-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-
-  font-size: 1.5rem;
-  font-weight: 500;
-  font-family: 'Raleway', sans-serif;
-}
-
 .bell-icon {
   animation: swing 700ms ease;
 }

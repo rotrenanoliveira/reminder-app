@@ -1,27 +1,22 @@
 body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  width: 90%;
+  margin: 1rem auto;
+  max-width: 1024px;
+  min-height: 100vh;  
+
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-button {
-  cursor: pointer;
-  padding: 0.6em 1.2em;
-
-  border-radius: 8px;
-  border: 2px solid transparent;
-
-  transition: border-color 0.25s;
+main {
+  width: 100%;
+  position: absolute;
+  top: 30%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #18181b;
+@media (min-width: 768px) {
+  body {
+    margin-top: 2rem;
   }
 }
-
-/* h1 {
-  font-size: 1.2em;
-  line-height: 1.1;
-} */

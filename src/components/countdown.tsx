@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import { ReminderContext } from '../contexts/reminder'
 import { calcDateTime } from '../util/calc-datetime'
 import { differenceInSeconds } from '../util/calc-date/difference-in-seconds'
+import '../styles/countdown.css'
 
 export function Countdown() {
   const { currentReminder, remainingSeconds, setSecondsRemaining, completeReminder } = useContext(ReminderContext)
@@ -46,6 +47,8 @@ export function Countdown() {
         <span>{minutes}</span>
         <span>{seconds}</span>
       </div>
+
+      <div className="divider" />
 
       <span className="description">{currentReminder.of}</span>
     </div>

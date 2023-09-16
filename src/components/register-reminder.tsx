@@ -1,5 +1,6 @@
 import { FormEvent, useContext } from 'react'
 import { ReminderContext } from '../contexts/reminder'
+import '../styles/register-reminder-form.css'
 
 export function RegisterReminderForm() {
   const { createNewReminder } = useContext(ReminderContext)
@@ -32,16 +33,26 @@ export function RegisterReminderForm() {
     event.currentTarget.reset()
   }
 
+  function handleInputGroupOnFocus(event: React.FocusEvent<HTMLDivElement, Element>) {
+    const elementClass = event.currentTarget.classList.value
+    event.currentTarget.classList.value = elementClass.concat(' border-onfocus')
+  }
+
+  function handleInputGroupOnBlur(event: React.FocusEvent<HTMLDivElement, Element>) {
+    event.currentTarget.classList.value = 'input-group'
+  }
+
   return (
     <form onSubmit={handleCreateReminder}>
-      <div className="inputs-form">
+      <div className="inputs">
         <span>Remind me</span>
-        <div>
+
+        <div className="input-group" onFocus={handleInputGroupOnFocus} onBlur={handleInputGroupOnBlur}>
           <label htmlFor="reminder-of">of:</label>
           <input type="text" name="reminder-of" required />
         </div>
 
-        <div>
+        <div className="input-group" onFocus={handleInputGroupOnFocus} onBlur={handleInputGroupOnBlur}>
           <label htmlFor="reminder-at">at:</label>
           <input type="datetime-local" name="reminder-at" placeholder="" required />
         </div>

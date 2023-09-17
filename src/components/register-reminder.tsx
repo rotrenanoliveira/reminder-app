@@ -49,12 +49,12 @@ export function RegisterReminderForm() {
 
         <div className="input-group" onFocus={handleInputGroupOnFocus} onBlur={handleInputGroupOnBlur}>
           <label htmlFor="reminder-of">of:</label>
-          <input type="text" name="reminder-of" required />
+          <input type="text" name="reminder-of" id="reminder-of" required />
         </div>
 
         <div className="input-group" onFocus={handleInputGroupOnFocus} onBlur={handleInputGroupOnBlur}>
           <label htmlFor="reminder-at">at:</label>
-          <input type="datetime-local" name="reminder-at" placeholder="" required />
+          <input type="datetime-local" name="reminder-at" id="reminder-at" placeholder="" required />
         </div>
       </div>
 

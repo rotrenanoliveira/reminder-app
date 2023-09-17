@@ -25,6 +25,8 @@
 
 .reminder .reminder-at {
   display: none;
+  color: #71717A;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .hidden-reminder {

@@ -40,29 +40,31 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
     },
   )
 
-  // GET reminders from reminders state
-  const reminders = remindersState.reminders
+  // GET reminders from reminders state and sort by status na order by closer
+  const reminders = remindersState.reminders.sort((a, b) => {
+    const aSecondsDiff = differenceInSeconds(new Date(a.at), new Date())
+    const bSecondsDiff = differenceInSeconds(new Date(b.at), new Date())
+
+    if (aSecondsDiff < bSecondsDiff) {
+      return -1
+    }
+
+    return 1
+  })
 
   // GET the current reminder by default is the closest
   const currentReminder = useMemo(() => {
     const remindersInProgress = reminders.filter((reminder) => reminder.status === 'in-progress')
 
-    const sortedReminders: Reminder[] = remindersInProgress.sort((a, b) => {
-      const aSecondsDiff = differenceInSeconds(new Date(a.at), new Date())
-      const bSecondsDiff = differenceInSeconds(new Date(b.at), new Date())
+    for (const reminder of remindersInProgress) {
+      const diff = differenceInSeconds(new Date(reminder.at), new Date())
 
-      if (aSecondsDiff < bSecondsDiff) {
-        return -1
+      if (diff < 0) {
+        completeReminder(reminder.id)
       }
+    }
 
-      if (aSecondsDiff > bSecondsDiff) {
-        return 1
-      }
-
-      return 0
-    })
-
-    const nearestReminder = sortedReminders.length > 0 ? sortedReminders[0] : undefined
+    const nearestReminder = remindersInProgress.length > 0 ? remindersInProgress[0] : undefined
 
     if (nearestReminder === undefined) {
       return null
@@ -129,7 +131,14 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
 
   return (
     <ReminderContext.Provider
-      value={{ reminders, currentReminder, remainingSeconds, createNewReminder, completeReminder, setSecondsRemaining }}
+      value={{
+        reminders,
+        currentReminder,
+        remainingSeconds,
+        createNewReminder,
+        completeReminder,
+        setSecondsRemaining,
+      }}
     >
       {children}
     </ReminderContext.Provider>

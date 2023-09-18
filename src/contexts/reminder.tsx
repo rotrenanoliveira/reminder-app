@@ -65,16 +65,23 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
   })
 
   // GET reminders from reminders state and sort by status na order by closer
-  const reminders = remindersState.reminders.sort((a, b) => {
-    const aSecondsDiff = differenceInSeconds(new Date(a.at), new Date())
-    const bSecondsDiff = differenceInSeconds(new Date(b.at), new Date())
+  const reminders = useMemo(() => {
+    const reminders = remindersState.reminders.sort((a, b) => {
+      const aSecondsDiff = differenceInSeconds(new Date(a.at), new Date())
+      const bSecondsDiff = differenceInSeconds(new Date(b.at), new Date())
 
-    if (aSecondsDiff < bSecondsDiff) {
-      return -1
-    }
+      if (aSecondsDiff < bSecondsDiff) {
+        return -1
+      }
 
-    return 1
-  })
+      return 1
+    })
+
+    const remindersInProgress = reminders.filter((reminder) => reminder.status === 'in-progress')
+    const remindersCompleted = reminders.filter((reminder) => reminder.status === 'completed')
+
+    return [...remindersInProgress, ...remindersCompleted]
+  }, [remindersState.reminders])
 
   // GET the current reminder by default is the closest
   const currentReminder = useMemo(() => {

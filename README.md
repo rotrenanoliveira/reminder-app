@@ -2,7 +2,7 @@
 
 This is a application built with React using Vite was created only for the purpose of studies.
 
-![Screenshot](.github/screenshot.png)
+![Screenshot](.github/preview.png)
 
 ---
 

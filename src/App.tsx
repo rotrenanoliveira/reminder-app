@@ -1,4 +1,4 @@
-import { useSetTheme } from './hooks/useSetTheme'
+import { useToggleTheme } from './hooks/useToggleTheme'
 import { Header } from './components/header'
 import { Countdown } from './components/countdown'
 import { RegisterReminderForm } from './components/register-reminder'
@@ -6,7 +6,8 @@ import { ReminderList } from './components/reminder-list'
 import './styles/home.css'
 
 export function App() {
-  useSetTheme()
+  const { setTheme } = useToggleTheme()
+  setTheme()
 
   return (
     <>

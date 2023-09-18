@@ -1,0 +1,25 @@
+.reminder-status {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+}
+
+.reminder-status.completed {
+  background-color: #16a34a;
+  box-shadow: 0 0 5px #16a34ac0;
+}
+
+.reminder-status.in-progress {
+  background-color: #facc15;
+  box-shadow: 0 0 2px #facc15;
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}

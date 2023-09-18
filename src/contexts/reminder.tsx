@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useMemo, useReducer, useState } from 'react'
-import { completeReminderAction, createReminder } from '../reducers/reminders/actions'
+import { completeReminderAction, createReminder, toggleVisibility } from '../reducers/reminders/actions'
 import { differenceInSeconds } from '../util/calc-date/difference-in-seconds'
 import { reminderReducer } from '../reducers/reminders/reducer'
 import { v4 as uuid } from 'uuid'
@@ -10,6 +10,7 @@ interface ReminderContextType {
   remainingSeconds: number
   createNewReminder: ({ reminderOf, reminderAt }: ReminderCreateInput) => void
   completeReminder: (reminderId: string) => void
+  toggleReminderVisibility: (reminderId: string) => void
   setSecondsRemaining: (seconds: number) => void
 }
 
@@ -114,6 +115,10 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
     dispatch(completeReminderAction(reminderId))
   }
 
+  function toggleReminderVisibility(reminderId: string) {
+    dispatch(toggleVisibility(reminderId))
+  }
+
   useEffect(() => {
     const stateJSON = JSON.stringify(remindersState)
     localStorage.setItem('@reminder-me:countdown', stateJSON)
@@ -137,6 +142,7 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
         remainingSeconds,
         createNewReminder,
         completeReminder,
+        toggleReminderVisibility,
         setSecondsRemaining,
       }}
     >

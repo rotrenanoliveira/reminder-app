@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 import { ReminderContext } from '../contexts/reminder'
+import { Reminder } from './reminder'
 import '../styles/reminder-list.css'
 
 export function ReminderList() {
@@ -16,12 +17,7 @@ export function ReminderList() {
   return (
     <section className="reminder-list">
       {reminders.map((reminder) => {
-        return (
-          <div className={`reminder ${reminder.visibility === 'hidden' ? 'hidden-reminder' : ''}`} key={reminder.id}>
-            <span className="reminder-of">{reminder.of}</span>{' '}
-            <span className="reminder-at">{new Date(reminder.at).toLocaleString('pt-BR')}</span>
-          </div>
-        )
+        return <Reminder key={reminder.id} reminder={reminder} />
       })}
     </section>
   )

@@ -28,6 +28,25 @@ export function reminderReducer(state: ReminderReducerState, action: any) {
         }),
       }
 
+    case ReminderReducerActionsTypes.TOGGLE_REMINDER_VISIBILITY:
+      return {
+        reminders: state.reminders.map((reminder) => {
+          if (reminder.id !== action.payload.reminderId) {
+            return reminder
+          }
+
+          const isReminderVisible = reminder.visibility === 'visible'
+          // console.log(isReminderVisible)
+          const visibility = isReminderVisible ? 'hidden' : 'visible'
+          // console.log(visibility)
+
+          return {
+            ...reminder,
+            visibility,
+          }
+        }),
+      }
+
     default:
       return state
   }

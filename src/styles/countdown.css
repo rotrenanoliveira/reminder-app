@@ -50,8 +50,6 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .countdown .divider {
-    background-color: #3f3f46;
-  }
+.dark-theme .countdown .divider {
+  background-color: #3f3f46;
 }

@@ -70,8 +70,6 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .hidden-reminder::after {
-    background: rgba(24, 24, 27, 0.2);
-  }
+.dark-theme .hidden-reminder::after {
+  background: rgba(24, 24, 27, 0.2);
 }

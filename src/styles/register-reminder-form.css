@@ -113,25 +113,29 @@ form button:hover {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .countdown .divider {
-    background-color: #52525b;
-  }
+.dark-theme .countdown .divider {
+  background-color: #52525b;
+}
 
-  form .inputs .input-group:hover,
-  form .inputs .input-group:focus-visible {
-    border-bottom: 1px solid #52525b;
-  }
+.dark-theme input {
+  color: rgba(255, 255, 255, 0.87);
+}
 
-  form .inputs .input-group.border-onfocus {
-    border-color: #52525b;
-  }
+.dark-theme form .inputs .input-group:hover,
+.dark-theme form .inputs .input-group:focus-visible {
+  border-bottom: 1px solid #52525b;
+}
 
-  form button {
-    background-color: #27272a;
-  }
+.dark-theme form .inputs .input-group.border-onfocus {
+  border-color: #52525b;
+}
 
-  form button:hover {
-    border-color: #3f3f46;
-  }
+.dark-theme form button {
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #27272a;
+}
+
+.dark-theme form button:hover {
+  color: rgba(255, 255, 255, 0.87);
+  border-color: #3f3f46;
 }

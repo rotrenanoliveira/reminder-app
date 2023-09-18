@@ -1,9 +1,29 @@
 header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+section.logo {
   display: flex;
   align-items: center;
   justify-content: center;
+  
   gap: 0.75rem;
-  margin: 0;
+}
+
+header button {
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  transition: color 0.3s;
+}
+
+header button:hover {
+  color: #3b82f6;
 }
 
 h1 {
@@ -11,6 +31,14 @@ h1 {
   line-height: 1.1;
   font-weight: 300;
   font-size: 1.5rem;
+}
+
+.dark-theme header button {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.dark-theme header button:hover {
+  color: #3b82f6;
 }
 
 .bell-icon {

@@ -23,7 +23,7 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-.reminder .info button {
+.reminder button {
   border: none;
   background: transparent;
   cursor: pointer;
@@ -31,11 +31,11 @@
   transition: color 0.3s;
 }
 
-.dark-theme .reminder .info button {
+.dark-theme .reminder button {
   color: rgba(255, 255, 255, 0.87);
 }
 
-.reminder .info button:hover {
+.reminder button:hover {
   color: #3b82f6;
   opacity: 0.75;
 }

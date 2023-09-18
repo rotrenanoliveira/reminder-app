@@ -12,6 +12,7 @@ interface ReminderContextType {
   completeReminder: (reminderId: string) => void
   toggleReminderVisibility: (reminderId: string) => void
   setSecondsRemaining: (seconds: number) => void
+  setCurrentReminder: (reminderId: string) => void
 }
 
 // Create Reminder Context
@@ -29,7 +30,7 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
       reminders: [],
     },
     () => {
-      const storedState = localStorage.getItem('@reminder-me:countdown')
+      const storedState = localStorage.getItem('@reminder:countdown')
 
       if (storedState) {
         return JSON.parse(storedState)
@@ -40,6 +41,22 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
       }
     },
   )
+
+  const [activeReminder, setActiveReminder] = useState(() => {
+    const activeReminderId = localStorage.getItem('@reminder:active-reminder')
+    if (!activeReminderId) {
+      return null
+    }
+
+    const activeReminder: Reminder = remindersState.reminders.find((reminder) => reminder.id === activeReminderId)
+    const secondsDiff = differenceInSeconds(new Date(activeReminder.at), new Date())
+
+    if (secondsDiff <= 0) {
+      return null
+    }
+
+    return activeReminder
+  })
 
   // GET reminders from reminders state and sort by status na order by closer
   const reminders = remindersState.reminders.sort((a, b) => {
@@ -55,13 +72,21 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
 
   // GET the current reminder by default is the closest
   const currentReminder = useMemo(() => {
+    if (activeReminder !== null) {
+      return {
+        ...activeReminder,
+        at: new Date(activeReminder.at),
+        createdAt: new Date(activeReminder.createdAt),
+      } as Reminder
+    }
+
     const remindersInProgress = reminders.filter((reminder) => reminder.status === 'in-progress')
 
     for (const reminder of remindersInProgress) {
       const diff = differenceInSeconds(new Date(reminder.at), new Date())
 
       if (diff < 0) {
-        completeReminder(reminder.id)
+        dispatch(completeReminderAction(reminder.id))
       }
     }
 
@@ -77,7 +102,7 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
       at: new Date(nearestReminder.at),
       createdAt: new Date(nearestReminder.createdAt),
     } as Reminder
-  }, [reminders])
+  }, [activeReminder, reminders])
 
   // Seconds left until reminder
   const [remainingSeconds, setRemainingSeconds] = useState(() => {
@@ -99,6 +124,8 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
     const status = secondsDiff > 0 ? 'in-progress' : 'completed'
     const visibility = status === 'completed' ? 'hidden' : 'visible'
 
+    localStorage.removeItem('@reminder:active-reminder')
+
     dispatch(
       createReminder({
         id: uuid(),
@@ -113,15 +140,38 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
 
   function completeReminder(reminderId: string) {
     dispatch(completeReminderAction(reminderId))
+
+    if (activeReminder?.id === reminderId) {
+      setActiveReminder(null)
+    }
   }
 
   function toggleReminderVisibility(reminderId: string) {
     dispatch(toggleVisibility(reminderId))
   }
 
+  function setCurrentReminder(reminderId: string) {
+    const reminder = remindersState.reminders.find((reminder) => reminder.id === reminderId)
+
+    if (!reminder) {
+      console.error('Reminder not found')
+      return
+    }
+
+    const secondsDiff = differenceInSeconds(new Date(reminder.at), new Date())
+
+    if (secondsDiff <= 0) {
+      console.warn('Reminders already completed cannot be active/current')
+      return
+    }
+
+    localStorage.setItem('@reminder:active-reminder', reminder.id)
+    setActiveReminder(reminder)
+  }
+
   useEffect(() => {
     const stateJSON = JSON.stringify(remindersState)
-    localStorage.setItem('@reminder-me:countdown', stateJSON)
+    localStorage.setItem('@reminder:countdown', stateJSON)
   }, [remindersState])
 
   useEffect(() => {
@@ -144,6 +194,7 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
         completeReminder,
         toggleReminderVisibility,
         setSecondsRemaining,
+        setCurrentReminder,
       }}
     >
       {children}

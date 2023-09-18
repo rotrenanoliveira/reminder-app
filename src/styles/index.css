@@ -3,7 +3,6 @@
   line-height: 1.5;
   font-weight: 400;
   
-  box-sizing: border-box;
   background-color: #FFFFFF;
   
   font-synthesis: none;
@@ -11,11 +10,21 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  width: 90%;
+  margin: 1rem auto;
+  max-width: 1024px;
+  min-height: 100%;
 }
 
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+footer {
+  margin: 2rem;
 }
 
 .dark-theme:root {

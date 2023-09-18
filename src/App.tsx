@@ -20,6 +20,10 @@ export function App() {
 
         <ReminderList />
       </main>
+
+      <footer>
+        by <a href="https://github.com/rotrenanoliveira">rotrenanoliveira</a> - 2023
+      </footer>
     </>
   )
 }

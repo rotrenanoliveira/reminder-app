@@ -12,7 +12,7 @@ form .inputs {
   width: 100%;
 
   display: flex;
-  align-items: flex-start;
+  /* align-items: flex-start; */
   justify-content: center;
   flex-direction: column;
   gap: 0.75rem;
@@ -20,7 +20,8 @@ form .inputs {
   margin-bottom: 1.5rem;
 }
 
-form .inputs span {
+form .inputs p {
+  width: 128px;
   font-size: 1rem;
   font-weight: 300;
 }
@@ -92,7 +93,8 @@ form button:hover {
     flex-direction: row;
   }
 
-  form .inputs span {
+  form .inputs p {
+    width: 128px;
     text-wrap: nowrap;
   }
 

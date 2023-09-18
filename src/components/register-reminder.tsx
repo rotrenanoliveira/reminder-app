@@ -45,7 +45,7 @@ export function RegisterReminderForm() {
   return (
     <form onSubmit={handleCreateReminder}>
       <div className="inputs">
-        <span>Remind me</span>
+        <p>Remind me</p>
 
         <div className="input-group" onFocus={handleInputGroupOnFocus} onBlur={handleInputGroupOnBlur}>
           <label htmlFor="reminder-of">of:</label>

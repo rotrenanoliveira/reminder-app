@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { CheckCircle, Circle, Eye, EyeOff } from 'lucide-react'
+import { CheckCircle, Circle, Eye, EyeOff, Trash } from 'lucide-react'
 import { ReminderContext } from '../contexts/reminder'
 import '../styles/reminder-status.css'
 
@@ -8,7 +8,7 @@ interface ReminderProps {
 }
 
 export function Reminder({ reminder }: ReminderProps) {
-  const { toggleReminderVisibility, setCurrentReminder, currentReminder } = useContext(ReminderContext)
+  const { currentReminder, toggleReminderVisibility, setCurrentReminder, removeReminder } = useContext(ReminderContext)
 
   function handleSetCurrentReminder() {
     setCurrentReminder(reminder.id)
@@ -16,6 +16,10 @@ export function Reminder({ reminder }: ReminderProps) {
 
   function handleReminderVisibility() {
     toggleReminderVisibility(reminder.id)
+  }
+
+  function handleDeleteReminder() {
+    removeReminder(reminder.id)
   }
 
   return (
@@ -45,6 +49,10 @@ export function Reminder({ reminder }: ReminderProps) {
 
         <button onClick={handleReminderVisibility} name="toggle-reminder-visibility">
           {reminder.visibility === 'visible' ? <EyeOff size={24} strokeWidth={1} /> : <Eye size={24} strokeWidth={1} />}
+        </button>
+
+        <button onClick={handleDeleteReminder} className="remove-reminder" name="button-delete-reminder">
+          <Trash size={20} strokeWidth={1} />
         </button>
       </div>
     </div>

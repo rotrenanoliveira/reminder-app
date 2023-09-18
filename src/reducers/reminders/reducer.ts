@@ -47,6 +47,11 @@ export function reminderReducer(state: ReminderReducerState, action: any) {
         }),
       }
 
+    case ReminderReducerActionsTypes.REMOVE_REMINDER:
+      return {
+        reminders: state.reminders.filter((reminder) => reminder.id !== action.payload.reminderId),
+      }
+
     default:
       return state
   }

@@ -1,5 +1,10 @@
 import React, { createContext, useEffect, useMemo, useReducer, useState } from 'react'
-import { completeReminderAction, createReminder, toggleVisibility } from '../reducers/reminders/actions'
+import {
+  completeReminderAction,
+  createReminder,
+  removeReminderAction,
+  toggleVisibility,
+} from '../reducers/reminders/actions'
 import { differenceInSeconds } from '../util/calc-date/difference-in-seconds'
 import { reminderReducer } from '../reducers/reminders/reducer'
 import { v4 as uuid } from 'uuid'
@@ -11,6 +16,7 @@ interface ReminderContextType {
   createNewReminder: ({ reminderOf, reminderAt }: ReminderCreateInput) => void
   completeReminder: (reminderId: string) => void
   toggleReminderVisibility: (reminderId: string) => void
+  removeReminder: (reminderId: string) => void
   setSecondsRemaining: (seconds: number) => void
   setCurrentReminder: (reminderId: string) => void
 }
@@ -150,6 +156,10 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
     dispatch(toggleVisibility(reminderId))
   }
 
+  function removeReminder(reminderId: string) {
+    dispatch(removeReminderAction(reminderId))
+  }
+
   function setCurrentReminder(reminderId: string) {
     const reminder = remindersState.reminders.find((reminder) => reminder.id === reminderId)
 
@@ -193,6 +203,7 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
         createNewReminder,
         completeReminder,
         toggleReminderVisibility,
+        removeReminder,
         setSecondsRemaining,
         setCurrentReminder,
       }}

@@ -31,6 +31,10 @@
   transition: color 0.3s;
 }
 
+.reminder button.remove-reminder:hover {
+  color: #ef4444;
+}
+
 .dark-theme .reminder button {
   color: rgba(255, 255, 255, 0.87);
 }

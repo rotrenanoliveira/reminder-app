@@ -26,6 +26,12 @@ form .inputs p {
   font-weight: 300;
 }
 
+.form-error {
+  margin: 1.25rem auto; 
+  font-size: 0.85rem;
+  color: #EF4444;
+}
+
 form .inputs .input-group {
   width: 100%;
 

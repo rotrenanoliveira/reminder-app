@@ -54,7 +54,11 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
       return null
     }
 
-    const activeReminder: Reminder = remindersState.reminders.find((reminder) => reminder.id === activeReminderId)
+    const activeReminder = remindersState.reminders.find((reminder) => reminder.id === activeReminderId)
+    if (!activeReminder) {
+      return null
+    }
+
     const secondsDiff = differenceInSeconds(new Date(activeReminder.at), new Date())
 
     if (secondsDiff <= 0) {
@@ -132,10 +136,9 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
 
   function createNewReminder(data: ReminderCreateInput) {
     const createdAt = new Date()
-    const secondsDiff = differenceInSeconds(data.reminderAt, createdAt)
 
-    const status = secondsDiff > 0 ? 'in-progress' : 'completed'
-    const visibility = status === 'completed' ? 'hidden' : 'visible'
+    const status = 'in-progress'
+    const visibility = 'visible'
 
     localStorage.removeItem('@reminder:active-reminder')
 

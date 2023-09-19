@@ -1,3 +1,4 @@
+import { LanguageProvider } from './contexts/language'
 import { useToggleTheme } from './hooks/useToggleTheme'
 import { Header } from './components/header'
 import { Countdown } from './components/countdown'
@@ -10,7 +11,7 @@ export function App() {
   setTheme()
 
   return (
-    <>
+    <LanguageProvider>
       <Header />
 
       <main>
@@ -24,6 +25,6 @@ export function App() {
       <footer>
         by <a href="https://github.com/rotrenanoliveira">rotrenanoliveira</a> - 2023
       </footer>
-    </>
+    </LanguageProvider>
   )
 }

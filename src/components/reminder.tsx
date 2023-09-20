@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { CheckCircle, Circle, Eye, EyeOff, Trash } from 'lucide-react'
+import { CheckCircle, Circle, CircleDot, Eye, EyeOff, Trash } from 'lucide-react'
 import { ReminderContext } from '../contexts/reminder'
 import '../styles/reminder-status.css'
 
@@ -27,14 +27,14 @@ export function Reminder({ reminder }: ReminderProps) {
       <div className="description">
         {reminder.status === 'in-progress' ? (
           currentReminder?.id === reminder.id ? (
-            <CheckCircle size={16} strokeWidth={1} />
+            <CircleDot size={16} strokeWidth={1} />
           ) : (
             <button onClick={handleSetCurrentReminder}>
               <Circle size={16} strokeWidth={1} />
             </button>
           )
         ) : (
-          <></>
+          <CheckCircle size={16} strokeWidth={1} />
         )}
         {reminder.status === 'completed' ? (
           <div className="reminder-status completed" />

@@ -168,6 +168,10 @@ export function ReminderContextProvider({ children }: ReminderContextProviderPro
 
   function removeReminder(reminderId: string) {
     dispatch(removeReminderAction(reminderId))
+
+    if (activeReminder?.id === reminderId) {
+      setActiveReminder(null)
+    }
   }
 
   function setCurrentReminder(reminderId: string) {
